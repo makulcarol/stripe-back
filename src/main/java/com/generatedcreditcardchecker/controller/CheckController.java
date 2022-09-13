@@ -28,9 +28,12 @@ public class CheckController {
     @PostMapping(value = "/check", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<Object> checkCreditCard(@RequestBody GeneratedCreditCardRequest generatedCreditCardRequest) {
         try {
-            checkService.checkCreditCardGenerated(generatedCreditCardRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
+            System.out.println("Validando cartões");
+            return new ResponseEntity<>(checkService.checkCreditCardGenerated(generatedCreditCardRequest),
+                    HttpStatus.OK);
         } catch (Exception exc) {
+            System.out.println("Erro");
+            System.out.println(exc.getStackTrace());
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, exc.getMessage(), exc);
         }

@@ -44,8 +44,9 @@ public class CheckService {
 
                 List<CreditCardResponse> result = new ArrayList<>();
 
-                generatedCreditCardRequest.getCreditCardGenerated().forEach(card -> {
+                for (GeneratedCreditCardInfo card : generatedCreditCardRequest.getCreditCardGenerated()) {
                         try {
+                                System.out.println(card.toString());
                                 String idToken = Objects.requireNonNull(getTokenStripe(card).getBody()).getId();
                                 HttpStatus response = checkCharge(idToken).getStatusCode();
 
@@ -61,24 +62,45 @@ public class CheckService {
                                         result.add(cardResult);
                                 }
                         } catch (HttpClientErrorException e) {
-                                final JSONObject obj = new JSONObject(e.getResponseBodyAsString());
-                                JSONObject content = obj.getJSONObject("error");
-                                CreditCardResponse cardResult = CreditCardResponse.builder()
-                                                .creditCard(card.getCardNumber() + "|" + card.getExpMonth() + "|"
-                                                                + card.getExpYear() + "|"
-                                                                + card.getSecurityCode())
-                                                .type(content.getString("type"))
-                                                .message(content.getString("message"))
-                                                .decline_code(content.getString("decline_code"))
-                                                .isOk(false)
-                                                .code(content.getString("code"))
-                                                .build();
-                                result.add(cardResult);
-                                System.out.println("Resultado:" + cardResult);
+                                try {
+                                        final JSONObject obj = new JSONObject(e.getResponseBodyAsString());
+                                        JSONObject content = obj.getJSONObject("error");
+                                        CreditCardResponse cardResult = CreditCardResponse.builder()
+                                                        .creditCard(card.getCardNumber() + "|" + card.getExpMonth()
+                                                                        + "|"
+                                                                        + card.getExpYear() + "|"
+                                                                        + card.getSecurityCode())
+                                                        .type(content.getString("type"))
+                                                        .message(content.getString("message"))
+                                                        .decline_code(content.getString("decline_code"))
+                                                        .isOk(false)
+                                                        .code(content.getString("code"))
+                                                        .build();
+                                        result.add(cardResult);
+                                        System.out.println("Resultado:" + cardResult);
+                                } catch (Exception exc) {
+                                        final JSONObject obj = new JSONObject(e.getResponseBodyAsString());
+                                        JSONObject content = obj.getJSONObject("error");
+                                        CreditCardResponse cardResult = CreditCardResponse.builder()
+                                                        .creditCard(card.getCardNumber() + "|" + card.getExpMonth()
+                                                                        + "|"
+                                                                        + card.getExpYear() + "|"
+                                                                        + card.getSecurityCode())
+                                                        .type(content.getString("type"))
+                                                        .message(content.getString("message"))
+                                                        .decline_code("")
+                                                        .isOk(false)
+                                                        .code(content.getString("code"))
+                                                        .build();
+                                        result.add(cardResult);
+                                        System.out.println("Resultado:" + cardResult);
+                                }
+
                         } catch (Exception e) {
                                 System.out.println();
                         }
-                });
+
+                }
                 return result;
         }
 
