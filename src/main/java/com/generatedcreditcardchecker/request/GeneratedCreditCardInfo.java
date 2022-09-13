@@ -7,7 +7,7 @@ public class GeneratedCreditCardInfo {
 
     private String cardNumber;
 
-    private String expMounth;
+    private String expMonth;
 
     private String expYear;
 
